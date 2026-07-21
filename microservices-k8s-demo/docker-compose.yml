@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+
+  cart-service:
+    build: ./cart-service
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
+      - PRODUCT_SERVICE_URL=http://product-service:5002
+    depends_on:
+      - product-service
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "5004:5004"
+    environment:
+      - PORT=5004
+      - USER_SERVICE_URL=http://user-service:5001
+      - CART_SERVICE_URL=http://cart-service:5003
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5005
+    depends_on:
+      - user-service
+      - cart-service
+      - notification-service
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "5005:5005"
+    environment:
+      - PORT=5005
